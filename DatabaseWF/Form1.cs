@@ -24,8 +24,41 @@ namespace DatabaseWF
 
         }
 
+        private void updateGridView()
+        {
+            using (SqlConnection conn = new SqlConnection())
+            {
+                conn.ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\student.SL228-03\\Source\\Repos\\DatabaseWF\\DatabaseWF\\MeasurementsDB.mdf;Integrated Security=True";
+                conn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand("select * from Measurements", conn);
+                try
+                {
+                    if (conn.State == ConnectionState.Closed)
+                        conn.Open();
+                    SqlDataAdapter sda = new SqlDataAdapter();
+                    sda.SelectCommand = sqlCmd;
+                    DataTable dbdataset = new DataTable();
+                    sda.Fill(dbdataset);
+                    BindingSource bSource = new BindingSource();
+                    bSource.DataSource = dbdataset;
+                    dataGridMeasurements.DataSource = dbdataset;
+                    sda.Update(dbdataset);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error 2");
+                }
+                finally
+                {
+                    conn.Close();
+                }
+            }
+        }
+
         private void loadList()
         {
+            updateGridView();
             using (SqlConnection conn = new SqlConnection())
             {
                 conn.ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\student.SL228-03\\Source\\Repos\\DatabaseWF\\DatabaseWF\\MeasurementsDB.mdf;Integrated Security=True";
@@ -139,6 +172,13 @@ namespace DatabaseWF
             {
                 MessageBox.Show(ex.Message, "Error");
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // TODO: Ten wiersz kodu wczytuje dane do tabeli 'measurementsDBDataSet.Measurements' . Możesz go przenieść lub usunąć.
+            this.measurementsTableAdapter.Fill(this.measurementsDBDataSet.Measurements);
+
         }
     }
 }
